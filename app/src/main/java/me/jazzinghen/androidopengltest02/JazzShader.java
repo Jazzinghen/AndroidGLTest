@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Class created to convert shaders into strings from files.
+ * Class created to get a vertex shader and a fragment shader and combine them into a shader Program.
  * I read a couple of tutorials and they all integrated constant strings into the code instead
  * of using external files. HerpDerp!
  */
@@ -21,38 +21,111 @@ public class JazzShader {
     // Using AssetManager to access the assets
     private final AssetManager fileManager;
 
-    private int ShaderHandler;
+    private int vertexShader;
+    private int fragmentShader;
 
-    public JazzShader(String shaderName, int shaderType, Context cont) {
+    private int programHandler;
+
+    public JazzShader(String vertName, String fragName, Context cont) {
         fileManager = cont.getAssets();
 
-        ShaderHandler = GLES20.glCreateShader(shaderType);
+        vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
+        fragmentShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
 
-        if (ShaderHandler != 0) {
+        programHandler = GLES20.glCreateProgram();
+
+        Log.d("GLSL Status", "Creation and Compilation of Vertex shader");
+
+        if (vertexShader != 0) {
             // Get the goddamn file and give it to the shader handler.
-            GLES20.glShaderSource(ShaderHandler, readFromFile(shaderName));
+            GLES20.glShaderSource(vertexShader, readFromFile(vertName));
 
             // Compile the shader
-            GLES20.glCompileShader(ShaderHandler);
+            GLES20.glCompileShader(vertexShader);
 
             // Get informations for compilation of shader
             final int[] compilationStatus = new int[1];
-            GLES20.glGetShaderiv(ShaderHandler, GLES20.GL_COMPILE_STATUS, compilationStatus, 0);
+            GLES20.glGetShaderiv(vertexShader, GLES20.GL_COMPILE_STATUS, compilationStatus, 0);
 
             if (compilationStatus[0] == 0) {
-                Log.w("GLSL Status:", "Vertex Shader copilation failed: " + GLES20.glGetShaderInfoLog(ShaderHandler));
-                GLES20.glDeleteShader(ShaderHandler);
-                ShaderHandler = 0;
+                Log.w("GLSL Status:", "Vertex Shader copilation failed: " + GLES20.glGetShaderInfoLog(vertexShader));
+                GLES20.glDeleteShader(vertexShader);
+                vertexShader = 0;
             }
 
-            if (ShaderHandler == 0) {
+            if (vertexShader == 0) {
                 throw new RuntimeException("Error creating vertex shader.");
             }
         }
+
+        Log.d("GLSL Status", "Creation and Compilation of Fragment shader");
+
+        if (fragmentShader != 0) {
+            // Get the goddamn file and give it to the shader handler.
+            GLES20.glShaderSource(fragmentShader, readFromFile(fragName));
+
+            // Compile the shader
+            GLES20.glCompileShader(fragmentShader);
+
+            // Get informations for compilation of shader
+            final int[] compilationStatus = new int[1];
+            GLES20.glGetShaderiv(fragmentShader, GLES20.GL_COMPILE_STATUS, compilationStatus, 0);
+
+            if (compilationStatus[0] == 0) {
+                Log.w("GLSL Status:", "Fragment Shader copilation failed: " + GLES20.glGetShaderInfoLog(fragmentShader));
+                GLES20.glDeleteShader(fragmentShader);
+                fragmentShader = 0;
+            }
+
+            if (fragmentShader == 0) {
+                throw new RuntimeException("Error creating fragment shader.");
+            }
+        }
+
+        Log.d("GLSL Status", "Creation and Linking of Shader Application");
+
+        if (programHandler != 0) {
+            // Attach Vertex Shader
+            GLES20.glAttachShader(programHandler, vertexShader);
+
+            // Attach Fragment Shader
+            GLES20.glAttachShader(programHandler, fragmentShader);
+
+            // Bind attributes of VBO
+            GLES20.glBindAttribLocation(programHandler, 0, "a_Position");
+            GLES20.glBindAttribLocation(programHandler, 1, "a_Colour");
+
+            // Link the two shaders into a single program
+            GLES20.glLinkProgram(programHandler);
+
+            // Get the link status.
+            final int[] linkStatus = new int[1];
+            GLES20.glGetProgramiv(programHandler, GLES20.GL_LINK_STATUS, linkStatus, 0);
+
+            // If the link failed, delete the program.
+            if (linkStatus[0] == 0) {
+                Log.w("GLSL Status:", "Shader Program link failed: " + GLES20.glGetShaderInfoLog(programHandler));
+                GLES20.glDeleteProgram(programHandler);
+                programHandler = 0;
+            }
+        }
+
+        if (programHandler == 0) {
+            throw new RuntimeException("Error creating program.");
+        }
+
     }
 
-    public int getShaderHandler() {
-        return ShaderHandler;
+    public int getVertexShader() {
+        return vertexShader;
+    }
+
+    public int getFragmentShader() {
+        return fragmentShader;
+    }
+
+    public int getProgramHandler() {
+        return programHandler;
     }
 
     private String readFromFile(String fileToRead) {
@@ -84,4 +157,5 @@ public class JazzShader {
 
         return ret;
     }
+
 }
