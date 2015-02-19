@@ -1,6 +1,7 @@
 package me.jazzinghen.androidopengltest02;
 
 import me.jazzinghen.androidopengltest02.JazzGLRender;
+import me.jazzinghen.androidopengltest02.util.JazzGLRendererTest01;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -21,7 +22,7 @@ public class JazzGLSurfaceView extends GLSurfaceView{
 
         if(!isInEditMode()) {
 
-            final JazzGLRender mRenderer;
+            final JazzGLRendererTest01 mRenderer;
 
             // Check if the system supports OpenGL ES 2.0.
             final ActivityManager activityManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
@@ -37,7 +38,7 @@ public class JazzGLSurfaceView extends GLSurfaceView{
                 setEGLConfigChooser(8,8,8,8,16,0);
                 setPreserveEGLContextOnPause(true);
 
-                mRenderer = new JazzGLRender();
+                mRenderer = new JazzGLRendererTest01(context);
 
                 setRenderer(mRenderer);
 
