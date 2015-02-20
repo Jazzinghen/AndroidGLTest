@@ -44,8 +44,12 @@ public class JazzGLShader {
     public JazzGLShader(String vertName, String fragName, Context cont) {
         fileManager = cont.getAssets();
 
+        Log.d("GLSL Status", "Creating Vertex and Fragment Shaders");
+
         vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
         fragmentShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
+
+        Log.d("GLSL Status", "Creating Shader Program");
 
         programHandler = GLES20.glCreateProgram();
 
@@ -135,7 +139,7 @@ public class JazzGLShader {
         // Set program handles. These will later be used to pass in values to the program.
         mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandler, "u_MVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(programHandler, "a_Position");
-        mColorHandle = GLES20.glGetAttribLocation(programHandler, "a_Color");
+        mColorHandle = GLES20.glGetAttribLocation(programHandler, "a_Colour");
     }
 
     private String readFromFile(String fileToRead) {

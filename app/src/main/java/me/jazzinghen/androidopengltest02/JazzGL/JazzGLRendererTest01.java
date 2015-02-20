@@ -19,10 +19,11 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
     /**
      * Store our model data in a float buffer.
      */
-    private final JazzGLTriangle Triangle1;
+    private JazzGLTriangle Triangle1;
     //private final FloatBuffer mTriangle2Vertices;
     //private final FloatBuffer mTriangle3Vertices;
 
+    private final Context renderingContext;
     /**
      * Store the view matrix. This can be thought of as our camera. This matrix transforms world space to eye space;
      * it positions things relative to our eye.
@@ -38,6 +39,13 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
      * Initialize the model data.
      */
     public JazzGLRendererTest01(Context context) {
+        renderingContext = context;
+    }
+
+    @Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        // Set the background clear color to gray.
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesData = {
@@ -53,13 +61,7 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
                 0.0f, 1.0f, 0.0f, 1.0f
         };
 
-        Triangle1 = new JazzGLTriangle(triangle1VerticesData, "Shaders/lesson01.vtx.glsl", "Shaders/lesson01.fgx.glsl", context);
-    }
-
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        // Set the background clear color to gray.
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
+        Triangle1 = new JazzGLTriangle(triangle1VerticesData, "Shaders/lesson01.vtx.glsl", "Shaders/lesson01.fgx.glsl", renderingContext);
 
         // Position the eye behind the origin.
         final float eyeX = 0.0f;

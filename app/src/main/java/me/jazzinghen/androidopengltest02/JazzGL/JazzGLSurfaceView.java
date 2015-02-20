@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 /**
- * Created by jazzinghen on 18/02/15.
+ * Modified GLSurfaceView in order to check the enviornment before launching the GLRenderer
  */
 public class JazzGLSurfaceView extends GLSurfaceView{
 
@@ -22,7 +22,7 @@ public class JazzGLSurfaceView extends GLSurfaceView{
             final JazzGLRendererTest01 mRenderer;
 
             // Check if the system supports OpenGL ES 2.0.
-            final ActivityManager activityManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
+            final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
             final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
             Log.d("OpenGLStatus", "Version: " + supportsEs2);
@@ -40,13 +40,11 @@ public class JazzGLSurfaceView extends GLSurfaceView{
                 setRenderer(mRenderer);
 
                 // Set rendering only when new data to render is available
-                setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-            }
-            else
-            {
-                // This is where you could create an OpenGL ES 1.x compatible
-                // renderer if you wanted to support both ES 1 and ES 2.
-                return;
+                // Needs a call to requestRender (), which is a public of SurfaceView, but I have
+                // to call it from the Triangle drawer. How do I do it in a non-sucky way?
+                // setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            } else {
+                Log.e("OpenGLES activity", "No OpenGLES 2.0 API support. Time to buy a new phone.");
             }
         }
     }
