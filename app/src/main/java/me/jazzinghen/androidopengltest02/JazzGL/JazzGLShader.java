@@ -26,6 +26,21 @@ public class JazzGLShader {
 
     private int programHandler;
 
+    /**
+     * This will be used to pass in the transformation matrix.
+     */
+    private int mMVPMatrixHandle;
+
+    /**
+     * This will be used to pass in model position information.
+     */
+    private int mPositionHandle;
+
+    /**
+     * This will be used to pass in model color information.
+     */
+    private int mColorHandle;
+
     public JazzGLShader(String vertName, String fragName, Context cont) {
         fileManager = cont.getAssets();
 
@@ -116,16 +131,11 @@ public class JazzGLShader {
 
     }
 
-    public int getVertexShader() {
-        return vertexShader;
-    }
-
-    public int getFragmentShader() {
-        return fragmentShader;
-    }
-
-    public int getProgramHandler() {
-        return programHandler;
+    public void initialiseHandlers() {
+        // Set program handles. These will later be used to pass in values to the program.
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandler, "u_MVPMatrix");
+        mPositionHandle = GLES20.glGetAttribLocation(programHandler, "a_Position");
+        mColorHandle = GLES20.glGetAttribLocation(programHandler, "a_Color");
     }
 
     private String readFromFile(String fileToRead) {
@@ -135,27 +145,41 @@ public class JazzGLShader {
         try {
             InputStream inputStream = fileManager.open(fileToRead);
 
-            if (inputStream != null) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString;
-                StringBuilder stringBuilder = new StringBuilder();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String receiveString;
+            StringBuilder stringBuilder = new StringBuilder();
 
-                while ((receiveString = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(receiveString);
-                    stringBuilder.append('\n');
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
+            while ((receiveString = bufferedReader.readLine()) != null) {
+                stringBuilder.append(receiveString);
+                stringBuilder.append('\n');
             }
+
+            inputStream.close();
+            ret = stringBuilder.toString();
+
         } catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
+            Log.e("AssetManager activity", "File not found: " + e.toString());
         } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
+            Log.e("AssetManager activity", "Can not read file: " + e.toString());
         }
 
         return ret;
     }
 
+    public int getProgramHandler() {
+        return programHandler;
+    }
+
+    public int getmMVPMatrixHandle() {
+        return mMVPMatrixHandle;
+    }
+
+    public int getmPositionHandle() {
+        return mPositionHandle;
+    }
+
+    public int getmColorHandle() {
+        return mColorHandle;
+    }
 }
