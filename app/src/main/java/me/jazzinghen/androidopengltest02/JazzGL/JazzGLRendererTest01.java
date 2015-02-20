@@ -4,11 +4,8 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 import android.util.Log;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -22,42 +19,15 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
     /**
      * Store our model data in a float buffer.
      */
-    private final FloatBuffer mTriangle1Vertices;
-    private final FloatBuffer mTriangle2Vertices;
-    private final FloatBuffer mTriangle3Vertices;
-
-    /**
-     * How many bytes per float.
-     * This is incredible. Since Java has beed designed to completely block the access to the size
-     * of types you _have_ to declare it by hand.
-     */
-    private final int mBytesPerFloat = 4;
+    private final JazzGLTriangle Triangle1;
+    //private final FloatBuffer mTriangle2Vertices;
+    //private final FloatBuffer mTriangle3Vertices;
 
     /**
      * Store the view matrix. This can be thought of as our camera. This matrix transforms world space to eye space;
      * it positions things relative to our eye.
      */
     private float[] mViewMatrix = new float[16];
-
-    /**
-     * This is the shader program instance
-     */
-    private JazzGLShader triangleShader;
-
-    /**
-     * This will be used to pass in the transformation matrix.
-     */
-    private int mMVPMatrixHandle;
-
-    /**
-     * This will be used to pass in model position information.
-     */
-    private int mPositionHandle;
-
-    /**
-     * This will be used to pass in model color information.
-     */
-    private int mColorHandle;
 
     /**
      * Store the projection matrix. This is used to project the scene onto a 2D viewport.
@@ -68,8 +38,6 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
      * Initialize the model data.
      */
     public JazzGLRendererTest01(Context context) {
-        Log.d("GLSL Status", "Creation and Compilation of Vertex shader");
-        triangleShader = new JazzGLShader("Shaders/lesson01.vtx.glsl", "Shaders/lesson01.fgx.glsl", context);
 
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesData = {
@@ -85,18 +53,7 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
                 0.0f, 1.0f, 0.0f, 1.0f
         };
 
-        /**
-         *  Initialize the buffers.
-         * This call is needed to reserve a space big as we need, with a nativeOrder for the bytes.
-         * We have to do this as OpenGLES requires data as you would pass to it in C++ in order to
-         * load the vertexBuffer to the GPU memory, but Java otherwise would optimize the memory
-         * in mysterious ways, fucking everything up.
-         */
-        mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * mBytesPerFloat)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-
-        // Copy the tirangle definition into our FloatBuffer
-        mTriangle1Vertices.put(triangle1VerticesData).position(0);
+        Triangle1 = new JazzGLTriangle(triangle1VerticesData, "Shaders/lesson01.vtx.glsl", "Shaders/lesson01.fgx.glsl", context);
     }
 
     @Override
@@ -123,15 +80,13 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
         // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        Triangle1.setmViewMatrix(mViewMatrix);
 
-
-        // Set program handles. These will later be used to pass in values to the program.
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(triangleShader.getProgramHandler(), "u_MVPMatrix");
-        mPositionHandle = GLES20.glGetAttribLocation(triangleShader.getProgramHandler(), "a_Position");
-        mColorHandle = GLES20.glGetAttribLocation(triangleShader.getProgramHandler(), "a_Color");
+        Triangle1.getTriangleShader().initialiseHandlers();
 
         // Tell OpenGL to use this program when rendering.
-        GLES20.glUseProgram(triangleShader.getProgramHandler());
+        Log.d("OpenGL", "Linking shader program to the scene.");
+        GLES20.glUseProgram(Triangle1.getTriangleShader().getProgramHandler());
     }
 
     @Override
@@ -142,20 +97,37 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
         final float ratio = (float) width / height;
-        final float left = -ratio;
-        final float right = ratio;
+        //final float left = -ratio;
+        //final float right = ratio;
         final float bottom = -1.0f;
         final float top = 1.0f;
         final float near = 1.0f;
         final float far = 10.0f;
 
-        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, bottom, top, near, far);
+        Triangle1.setmProjectionMatrix(mProjectionMatrix);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // TODO: Actually Draw stuff! :D
+        // Do a complete rotation every 10 seconds.
+        long time = SystemClock.uptimeMillis() % 10000L;
+        float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
+        float[] mModelMatrix = new float[16];
+
+        // Draw the triangle facing straight on.
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+
+        // Set model matrix after having computed it
+        Triangle1.setmModelMatrix(mModelMatrix);
+
+        // DRAW!
+        //
+        // [Haha, did you get it?]
+        Triangle1.draw();
+
     }
 }
