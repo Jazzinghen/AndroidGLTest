@@ -1,4 +1,4 @@
-package me.jazzinghen.androidopengltest02;
+package me.jazzinghen.androidopengltest02.JazzGL;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;

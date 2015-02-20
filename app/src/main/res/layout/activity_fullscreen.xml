@@ -7,7 +7,7 @@
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
     <view
-        class="me.jazzinghen.androidopengltest02.JazzGLSurfaceView"
+        class="me.jazzinghen.androidopengltest02.JazzGL.JazzGLSurfaceView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/RenderWindow" />

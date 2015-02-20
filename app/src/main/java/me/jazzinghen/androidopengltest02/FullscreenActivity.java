@@ -1,16 +1,14 @@
 package me.jazzinghen.androidopengltest02;
 
 import me.jazzinghen.androidopengltest02.util.SystemUiHider;
-import me.jazzinghen.androidopengltest02.JazzGLSurfaceView;
+import me.jazzinghen.androidopengltest02.JazzGL.JazzGLSurfaceView;
 
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.opengl.GLES10;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 

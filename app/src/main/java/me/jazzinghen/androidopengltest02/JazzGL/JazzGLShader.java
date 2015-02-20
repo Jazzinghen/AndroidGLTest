@@ -1,4 +1,4 @@
-package me.jazzinghen.androidopengltest02;
+package me.jazzinghen.androidopengltest02.JazzGL;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
  * I read a couple of tutorials and they all integrated constant strings into the code instead
  * of using external files. HerpDerp!
  */
-public class JazzShader {
+public class JazzGLShader {
 
     // Using AssetManager to access the assets
     private final AssetManager fileManager;
@@ -26,7 +26,7 @@ public class JazzShader {
 
     private int programHandler;
 
-    public JazzShader(String vertName, String fragName, Context cont) {
+    public JazzGLShader(String vertName, String fragName, Context cont) {
         fileManager = cont.getAssets();
 
         vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);

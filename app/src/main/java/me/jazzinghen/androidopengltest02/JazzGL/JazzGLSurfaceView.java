@@ -1,7 +1,4 @@
-package me.jazzinghen.androidopengltest02;
-
-import me.jazzinghen.androidopengltest02.JazzGLRender;
-import me.jazzinghen.androidopengltest02.util.JazzGLRendererTest01;
+package me.jazzinghen.androidopengltest02.JazzGL;
 
 import android.app.ActivityManager;
 import android.content.Context;

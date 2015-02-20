@@ -1,4 +1,4 @@
-package me.jazzinghen.androidopengltest02.util;
+package me.jazzinghen.androidopengltest02.JazzGL;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -6,15 +6,12 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
-import me.jazzinghen.androidopengltest02.JazzShader;
 
 /**
  * Test OpenGLESRenderer created to get back on track with OpenGL
@@ -45,7 +42,7 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
     /**
      * This is the shader program instance
      */
-    private JazzShader triangleShader;
+    private JazzGLShader triangleShader;
 
     /**
      * This will be used to pass in the transformation matrix.
@@ -72,7 +69,7 @@ public class JazzGLRendererTest01 implements GLSurfaceView.Renderer {
      */
     public JazzGLRendererTest01(Context context) {
         Log.d("GLSL Status", "Creation and Compilation of Vertex shader");
-        triangleShader = new JazzShader("Shaders/lesson01.vtx.glsl", "Shaders/lesson01.fgx.glsl", context);
+        triangleShader = new JazzGLShader("Shaders/lesson01.vtx.glsl", "Shaders/lesson01.fgx.glsl", context);
 
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesData = {
